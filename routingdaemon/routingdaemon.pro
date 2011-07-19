@@ -25,7 +25,7 @@ unix {
 	QMAKE_CXXFLAGS_DEBUG += -Wno-unused-function
 }
 
-LIBS += -L../bin/plugins_client -lcontractionhierarchiesclient -lgpsgridclient
+LIBS += -L../bin/plugins_client -lcontractionhierarchiesclient_nogui -lgpsgridclient_nogui
 
 SOURCES += \
 	 routingdaemon.cpp \
