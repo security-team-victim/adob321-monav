@@ -1,4 +1,5 @@
 /*
+Copyright 2011  Aleksandr Dobkin adob321@gmail.com
 Copyright 2010  Christian Vetter veaac.fdirct@gmail.com
 
 This file is part of MoNav.
@@ -249,6 +250,7 @@ main(int argc, char *argv[])
         if (db_get(pt, data))
         {
             printf("0 %d %d\n", data.travel_time, data.distance);
+            fflush(stdout);
             continue;
         }
         
@@ -261,7 +263,7 @@ main(int argc, char *argv[])
                                     /* heading penalty*/ 0,
                                     /* heading */ 0);
         if (not found) {
-            fprintf(stderr, "Could not find from point\n");
+            fprintf(stderr, "Could not find from point (%f %f)\n", from_lat, from_lng);
             printf("1\n");
             continue;
         }
@@ -309,6 +311,7 @@ main(int argc, char *argv[])
         db_put(pt, data);
         
         printf("0 %d %d\n", data.travel_time, data.distance);
+        fflush(stdout);
         
     }
     
