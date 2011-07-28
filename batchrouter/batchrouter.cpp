@@ -42,12 +42,12 @@ DB *db;
 void testPlugin( QObject* plugin, QString routerName, QString gpsLookupName )
 {
         if ( IGPSLookup *interface = qobject_cast< IGPSLookup* >( plugin ) ) {
-                qDebug() << "found plugin:" << interface->GetName();
+                qDebug() << "INFO: found plugin:" << interface->GetName();
                 if ( interface->GetName() == gpsLookupName )
                         gps_lookup = interface;
         }
         if ( IRouter *interface = qobject_cast< IRouter* >( plugin ) ) {
-                qDebug() << "found plugin:" << interface->GetName();
+                qDebug() << "INFO: found plugin:" << interface->GetName();
                 if ( interface->GetName() == routerName )
                         router = interface;
         }
@@ -58,13 +58,13 @@ bool loadPlugins( QString dataDirectory )
         QDir dir( dataDirectory );
         QString configFilename = dir.filePath( "Module.ini" );
         if ( !QFile::exists( configFilename ) ) {
-                qCritical() << "Not a valid routing module directory: Missing Module.ini";
+                qCritical() << "FATAL: Not a valid routing module directory: Missing Module.ini";
                 return false;
         }
         QSettings pluginSettings( configFilename, QSettings::IniFormat );
         int iniVersion = pluginSettings.value( "configVersion" ).toInt();
         if ( iniVersion != 2 ) {
-                qCritical() << "Config File not compatible";
+                qCritical() << "FATAL: Config File not compatible";
                 return false;
         }
         QString routerName = pluginSettings.value( "router" ).toString();
@@ -76,42 +76,42 @@ bool loadPlugins( QString dataDirectory )
         try
         {
                 if ( gps_lookup == NULL ) {
-                        qCritical() << "GPSLookup plugin not found:" << gpsLookupName;
+                        qCritical() << "FATAL: GPSLookup plugin not found:" << gpsLookupName;
                         return false;
                 }
                 int gpsLookupFileFormatVersion = pluginSettings.value( "gpsLookupFileFormatVersion" ).toInt();
                 if ( !gps_lookup->IsCompatible( gpsLookupFileFormatVersion ) ) {
-                        qCritical() << "GPS Lookup file format not compatible";
+                        qCritical() << "FATAL: GPS Lookup file format not compatible";
                         return false;
                 }
                 gps_lookup->SetInputDirectory( dataDirectory );
                 if ( !gps_lookup->LoadData() ) {
-                        qCritical() << "could not load GPSLookup data";
+                        qCritical() << "FATAL: Could not load GPSLookup data";
                         return false;
                 }
 
                 if ( router == NULL ) {
-                        qCritical() << "router plugin not found:" << routerName;
+                        qCritical() << "FATAL: Router plugin not found:" << routerName;
                         return false;
                 }
                 int routerFileFormatVersion = pluginSettings.value( "routerFileFormatVersion" ).toInt();
                 if ( !gps_lookup->IsCompatible( routerFileFormatVersion ) ) {
-                        qCritical() << "Router file format not compatible";
+                        qCritical() << "FATAL: Router file format not compatible";
                         return false;
                 }
                 router->SetInputDirectory( dataDirectory );
                 if ( !router->LoadData() ) {
-                        qCritical() << "could not load router data";
+                        qCritical() << "FATAL: Could not load router data";
                         return false;
                 }
         }
         catch ( ... )
         {
-                qCritical() << "caught exception while loading plugins";
+                qCritical() << "FATAL: Caught exception while loading plugins";
                 return false;
         }
 
-        qDebug() << "loaded:" << pluginSettings.value( "name" ).toString() << pluginSettings.value( "description" ).toString();
+        qDebug() << "INFO: loaded:" << pluginSettings.value( "name" ).toString() << pluginSettings.value( "description" ).toString();
 
         return true;
 }
@@ -135,12 +135,12 @@ void open_db(const char *filename)
     int ret;
     
     if ((ret = db_create(&db, NULL, 0)) != 0) {
-        fprintf(stderr, "db_create: %s\n", db_strerror(ret));
+        fprintf(stderr, "FATAL: Error creating database: %s\n", db_strerror(ret));
         exit(1);
     }
     
     if ((ret = db->open(db, NULL, filename, NULL, DB_HASH, DB_CREATE, 0600)) != 0) {
-        fprintf(stderr, "db->open: %s\n", db_strerror(ret));
+        fprintf(stderr, "FATAL: Error opening database: %s\n", db_strerror(ret));
         exit (1);
     }
 }
@@ -187,7 +187,7 @@ void db_put(const Pt & pt, const Data & value)
     
     if ( (ret = db->put(db, NULL, &key, &data, 0)) != 0)
     {
-        fprintf(stderr, "db->put error\n");
+        fprintf(stderr, "CRITICAL: db->put error\n");
     }
 }
 
@@ -216,7 +216,7 @@ bool db_get(const Pt & pt, Data & value)
         return false;
     
     else
-        fprintf(stderr, "db->get error\n");
+        fprintf(stderr, "CRITICAL: db->get error\n");
     
     return false;
 }
@@ -265,6 +265,7 @@ main(int argc, char *argv[])
         if (not found) {
             fprintf(stderr, "Could not find from point (%f %f)\n", from_lat, from_lng);
             printf("1\n");
+            fflush(stdout);
             continue;
         }
         
@@ -275,6 +276,7 @@ main(int argc, char *argv[])
         if (not found) {
             fprintf(stderr, "Could not find to point\n");
             printf("2\n");
+            fflush(stdout);
             continue;
         }
         
@@ -286,6 +288,7 @@ main(int argc, char *argv[])
         if (not found) {
             fprintf(stderr, "Could not calculate route");
             printf("3\n");
+            fflush(stdout);
             continue;
         }
         
