@@ -235,9 +235,9 @@ main(int argc, char *argv[])
     
     
     double from_lat, from_lng, to_lat, to_lng;
-    
     while ( scanf("%lf %lf %lf %lf", &from_lat, &from_lng, &to_lat, &to_lng) == 4)
     {
+        
         //QTime time;
         //time.start();
         bool found;
