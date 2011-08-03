@@ -14,6 +14,7 @@ Q_IMPORT_PLUGIN( gpsgridclient );
 static IGPSLookup *gps_lookup;
 static IRouter *router;
 
+static
 void testPlugin( QObject* plugin, QString routerName, QString gpsLookupName )
 {
         if ( IGPSLookup *interface = qobject_cast< IGPSLookup* >( plugin ) ) {
@@ -28,6 +29,7 @@ void testPlugin( QObject* plugin, QString routerName, QString gpsLookupName )
         }
 }
 
+static
 bool loadPlugins( QString dataDirectory )
 {
         QDir dir( dataDirectory );
@@ -91,19 +93,21 @@ bool loadPlugins( QString dataDirectory )
         return true;
 }
 
+extern "C" 
 int init(const char *arg)
 {
     if (not loadPlugins(arg))
         return 1;
     
-    
-    
     return 0;
 }
 
+extern "C"
 int route(double from_lat, double from_lng, double to_lat, double to_lng,
               double *time, double *distance)
 {
+//     fprintf(stderr, "start routing (%f %f) -> (%f %f)\n",
+//         from_lat, from_lng, to_lat, to_lng);
     
     bool found;
     double ftime;

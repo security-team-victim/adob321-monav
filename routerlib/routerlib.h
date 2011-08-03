@@ -1,6 +1,6 @@
 #pragma once
 
-extern "C" {
+
     enum RoutingResult {
         ROUTING_OK = 0,
         ROUTING_FROM_NOT_FOUND,
@@ -9,7 +9,6 @@ extern "C" {
         ROUTING_ERROR
     };
     
-    int init(const char *path);
-    int route(double from_lat, double from_lng, double to_lat, double to_lng,
-              int *time, int *distance);
-}
+extern "C" int init(const char *path);
+extern "C" int route(double from_lat, double from_lng, double to_lat, double to_lng,
+              double *time, double *distance);
